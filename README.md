@@ -153,7 +153,7 @@ Custom style examples are in [`CUSTOM_STYLES.md`](CUSTOM_STYLES.md).
 - Gapless playback is experimental and switchable. Use `gap off` / `gapless off` to return to the safe single-track path.
 - Media key support is optional and platform/session dependent. Use `mk off` if the OS integration causes problems.
 - If Windows audio changes after RDP/local-login, Bluetooth, HDMI, USB DAC, or sleep/wake, use `audio status` to compare DISC's active output with the OS default output, `audio devices` to list outputs, and `audio reset` to reopen the current default output without restarting the app. Runtime audio backend warnings should appear in Messages rather than the command input panel.
-- This package is the source release candidate. Platform binary archives should be built from this exact source once RC testing is complete.
+- Windows and macOS downloads are on the [Releases page](https://github.com/matthew-idealog/disc/releases). They are not code-signed, so Windows SmartScreen and macOS Gatekeeper warn on first launch; the release notes explain how to proceed.
 
 ## Release notes
 

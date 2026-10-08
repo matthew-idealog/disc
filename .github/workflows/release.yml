@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release --locked
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory dist | Out-Null
+          Copy-Item target/release/disc.exe, README.md, CHANGELOG.md dist/
+          Compress-Archive -Path dist/* -DestinationPath disc-windows-x86_64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: disc-windows-x86_64.zip
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - run: cargo build --release --locked --target aarch64-apple-darwin
+      - run: cargo build --release --locked --target x86_64-apple-darwin
+      - name: Package
+        run: |
+          mkdir dist
+          lipo -create -output dist/disc \
+            target/aarch64-apple-darwin/release/disc \
+            target/x86_64-apple-darwin/release/disc
+          packaging/build-macos-app.sh dist/disc "${GITHUB_REF_NAME#v}" dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/DISC-macos.zip
+
+  release:
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          case "$GITHUB_REF_NAME" in *-*) PRERELEASE="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" $PRERELEASE \
+            --title "DISC ${GITHUB_REF_NAME#v}" \
+            --notes-file packaging/release-notes.md \
+            disc-windows-x86_64.zip DISC-macos.zip
