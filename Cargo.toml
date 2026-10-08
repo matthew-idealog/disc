@@ -1,0 +1,26 @@
+[package]
+name = "disc"
+version = "0.1.0-rc.21"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+crossterm = "0.27"
+dirs = "5"
+md5 = "0.7"
+rand = "0.8"
+ratatui = "0.26"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+toml = "0.8"
+unicode-width = "0.1"
+serde_json = "1"
+rodio = "0.19"
+cpal = "0.15"
+urlencoding = "2"
+gag = "1"
+os_pipe = "1"
+
+souvlaki = "0.8.3"
